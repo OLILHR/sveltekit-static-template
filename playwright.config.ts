@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+// run "npx playwright test" for testing
 
 export default defineConfig({
   testDir: "./tests/e2e",
