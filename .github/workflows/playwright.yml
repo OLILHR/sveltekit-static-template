@@ -33,7 +33,7 @@ jobs:
         run: npm run build
 
       - name: Start dev server
-        run: npm run dev
+        run: npm run dev &
 
       - name: Run Playwright tests
         run: npx playwright test
