@@ -18,7 +18,7 @@
     "@sveltejs/adapter-static": "^3.0.2",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
-    "@types/node": "^20.14.7",
+    "@types/node": "^20.14.8",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
     "autoprefixer": "^10.4.19",
