@@ -13,12 +13,12 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "@playwright/test": "^1.45.1",
+    "@playwright/test": "^1.45.3",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/adapter-static": "^3.0.2",
     "@sveltejs/kit": "^2.5.18",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
-    "@types/node": "^20.14.10",
+    "@types/node": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "^7.17.0",
     "@typescript-eslint/parser": "^7.17.0",
     "autoprefixer": "^10.4.19",
@@ -26,7 +26,7 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-svelte": "^2.43.0",
     "playwright": "^1.45.1",
-    "postcss": "^8.4.39",
+    "postcss": "^8.4.40",
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^4.0.0",
     "prettier-plugin-svelte": "^3.2.6",
