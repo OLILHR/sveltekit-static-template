@@ -28,7 +28,7 @@
     "playwright": "^1.47.1",
     "postcss": "^8.4.47",
     "prettier": "^3.3.3",
-    "prettier-plugin-organize-imports": "^4.0.0",
+    "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-svelte": "^3.2.6",
     "sass": "^1.79.3",
     "scss": "^0.2.4",
