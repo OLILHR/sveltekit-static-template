@@ -13,7 +13,7 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "@playwright/test": "^1.46.1",
+    "@playwright/test": "^1.47.2",
     "@sveltejs/adapter-auto": "^3.2.5",
     "@sveltejs/adapter-static": "^3.0.5",
     "@sveltejs/kit": "^2.5.24",
