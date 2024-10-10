@@ -1,15 +1,14 @@
-name: "Github Pages preview"
+name: "Github Pages Preview"
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
-  build_and_preview:
+  build_preview:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           submodules: "recursive"
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -27,10 +26,53 @@ jobs:
           BASE_PATH: "/${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.number }}"
         run: npm run build
 
-      - name: Preview
-        uses: rossjrw/pr-preview-action@v1
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
         with:
-          source-dir: build
-          preview-branch: gh-pages
-          umbrella-dir: pr-preview
-          action: auto
+          name: pr-preview
+          path: build
+
+  deploy_preview:
+    needs: build_preview
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download existing site
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: existing-site
+          sparse-checkout: |
+            !pr-preview
+
+      - name: Download PR preview artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: pr-preview
+          path: existing-site/pr-preview/pr-${{ github.event.number }}
+
+      - name: Upload combined artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: existing-site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Comment PR
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.name,
+              body: 'Preview deployed to ${{ steps.deployment.outputs.page_url }}pr-preview/pr-${{ github.event.number }}/'
+            })
