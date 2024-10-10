@@ -8,12 +8,14 @@ jobs:
   build_preview:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           submodules: "recursive"
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/setup-node@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
@@ -23,13 +25,13 @@ jobs:
 
       - name: Build
         env:
-          BASE_PATH: "/${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.number }}"
+          BASE_PATH: "/${{ github.event.repository.name }}/preview/pr-${{ github.event.number }}"
         run: npm run build
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: pr-preview
+          name: preview
           path: build
 
   deploy_preview:
@@ -42,24 +44,16 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Download existing site
-        uses: actions/checkout@v4
+      - name: Download preview artifact
+        uses: actions/download-artifact@v4
         with:
-          ref: gh-pages
-          path: existing-site
-          sparse-checkout: |
-            !pr-preview
-
-      - name: Download PR preview artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: pr-preview
-          path: existing-site/pr-preview/pr-${{ github.event.number }}
+          name: preview
+          path: preview/pr-${{ github.event.number }}
 
       - name: Upload combined artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: existing-site
+          path: .
 
       - name: Deploy to GitHub Pages
         id: deployment
@@ -74,5 +68,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.name,
-              body: 'Preview deployed to ${{ steps.deployment.outputs.page_url }}pr-preview/pr-${{ github.event.number }}/'
+              body: 'Preview deployed to ${{ steps.deployment.outputs.page_url }}preview/pr-${{ github.event.number }}/'
             })
