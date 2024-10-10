@@ -10,10 +10,10 @@ const config = {
       assets: "build",
       fallback: "404.html",
       paths: {
-        base:
-          process.env.NODE_ENV === "production"
-            ? "/sveltekit-static-template"
-            : "",
+        base: process.env.BASE_PATH || "",
+      },
+      files: {
+        assets: "static",
       },
       precompress: false,
       strict: true,
