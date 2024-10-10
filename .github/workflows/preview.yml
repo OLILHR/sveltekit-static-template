@@ -1,4 +1,4 @@
-name: "Github Pages Preview"
+name: "Preview"
 
 on:
   pull_request:
@@ -40,9 +40,7 @@ jobs:
     permissions:
       pages: write
       id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      pull-requests: write
     steps:
       - name: Download preview artifact
         uses: actions/download-artifact@v4
@@ -64,9 +62,20 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.name,
-              body: 'Preview deployed to ${{ steps.deployment.outputs.page_url }}preview/pr-${{ github.event.number }}/'
-            })
+            const previewUrl = '${{ steps.deployment.outputs.page_url }}preview/pr-${{ github.event.number }}/';
+            console.log('Preview URL:', previewUrl);
+            console.log('PR Number:', context.issue.number);
+            console.log('Repo Owner:', context.repo.owner);
+            console.log('Repo Name:', context.repo.name);
+            try {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.name,
+                body: `Preview deployed to [${previewUrl}](${previewUrl})`
+              });
+              console.log('Comment posted successfully');
+            } catch (error) {
+              console.error('Error posting comment:', error.message);
+              console.error('Full error:', JSON.stringify(error, null, 2));
+            }
