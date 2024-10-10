@@ -29,7 +29,7 @@ jobs:
 
       - name: Build
         env:
-          BASE_PATH: "/${{ github.event.repository.name }}/preview/pr-${{ github.event.number }}"
+          BASE_PATH: "/${{ github.repository }}/preview/pr-${{ github.event.number }}"
         run: npm run build
 
       - name: Upload artifact
@@ -41,15 +41,33 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+      - name: Debug Info
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "PR Number: ${{ github.event.number }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Event Name: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+
       - name: Comment PR
         uses: actions/github-script@v7
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const previewUrl = `${{ steps.deployment.outputs.page_url }}preview/pr-${{ github.event.number }}/`;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.name,
-              body: `🚀 Github Pages Preview: ${previewUrl}`
-            });
+            console.log('Preview URL:', previewUrl);
+            console.log('PR Number:', context.issue.number);
+            console.log('Repo:', context.repo.owner + '/' + context.repo.name);
+            try {
+              const response = await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.name,
+                issue_number: context.issue.number,
+                body: `🚀 Github Pages Preview: ${previewUrl}`
+              });
+              console.log('Comment created successfully. Response:', JSON.stringify(response, null, 2));
+            } catch (error) {
+              console.error('Error creating comment:', error.message);
+              console.error('Full error:', JSON.stringify(error, null, 2));
+              core.setFailed(`Failed to create comment: ${error.message}`);
+            }
