@@ -5,14 +5,18 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  build_preview:
+  build_and_deploy_preview:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: "recursive"
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -29,53 +33,23 @@ jobs:
         run: npm run build
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: preview
-          path: build
-
-  deploy_preview:
-    needs: build_preview
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-      pull-requests: write
-    steps:
-      - name: Download preview artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: preview
-          path: preview/pr-${{ github.event.number }}
-
-      - name: Upload combined artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: build
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
 
       - name: Comment PR
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const previewUrl = '${{ steps.deployment.outputs.page_url }}preview/pr-${{ github.event.number }}/';
-            console.log('Preview URL:', previewUrl);
-            console.log('PR Number:', context.issue.number);
-            console.log('Repo Owner:', context.repo.owner);
-            console.log('Repo Name:', context.repo.name);
-            try {
-              await github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.name,
-                body: `Preview deployed to [${previewUrl}](${previewUrl})`
-              });
-              console.log('Comment posted successfully');
-            } catch (error) {
-              console.error('Error posting comment:', error.message);
-              console.error('Full error:', JSON.stringify(error, null, 2));
-            }
+            const previewUrl = `${{ steps.deployment.outputs.page_url }}preview/pr-${{ github.event.number }}/`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.name,
+              body: `🚀 Github Pages Preview: ${previewUrl}`
+            });
