@@ -11,3 +11,15 @@
   <img src="https://skillicons.dev/icons?i=docker" width="84" height="84" alt="docker" title="docker" />
 
 </p>
+
+### required project settings to deploy to Github Pages
+
+`Settings → Actions → General`: Workflow Permissions
+
+✔ Read and write permissions
+
+✔ Allow GitHub Actions to create and approve pull requests
+
+`Settings → Pages`: Build and deployment → Source: **Github Actions**
+
+`Settings → Environments → github-pages`: Deployment branches and tags → **No restriction**
