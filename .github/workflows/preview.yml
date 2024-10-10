@@ -5,18 +5,14 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  build_and_deploy_preview:
+  build_preview:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: "recursive"
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -29,13 +25,33 @@ jobs:
 
       - name: Build
         env:
-          BASE_PATH: /${{ github.event.repository.name }}/preview/pr-${{ github.event.number }}
+          BASE_PATH: "/${{ github.event.repository.name }}/preview/pr-${{ github.event.number }}"
         run: npm run build
 
       - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview
+          path: build
+
+  deploy_preview:
+    needs: build_preview
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+      pull-requests: write
+    steps:
+      - name: Download preview artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: preview
+          path: preview/pr-${{ github.event.number }}
+
+      - name: Upload combined artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build
+          path: .
 
       - name: Deploy to GitHub Pages
         id: deployment
