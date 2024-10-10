@@ -8,14 +8,12 @@ jobs:
   build_preview:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           submodules: "recursive"
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
@@ -57,26 +55,16 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Comment PR
+      - name: Create PR comment
         uses: actions/github-script@v7
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
             const previewUrl = `${{ steps.deployment.outputs.page_url }}preview/pr-${{ github.event.number }}/`;
-            console.log('Preview URL:', previewUrl);
-            console.log('PR Number:', context.issue.number);
-            console.log('Repo:', owner + '/' + repo);
-            try {
-              const response = await github.rest.issues.createComment({
-                owner: owner,
-                repo: repo,
-                issue_number: context.issue.number,
-                body: `🚀 Github Pages Preview: ${previewUrl}`
-              });
-              console.log('Comment created successfully. Response:', JSON.stringify(response, null, 2));
-            } catch (error) {
-              console.error('Error creating comment:', error.message);
-              console.error('Full error:', JSON.stringify(error, null, 2));
-              core.setFailed(`Failed to create comment: ${error.message}`);
-            }
+            await github.rest.issues.createComment({
+              owner: owner,
+              repo: repo,
+              issue_number: context.issue.number,
+              body: `🚀 Github Pages Preview: ${previewUrl}`
+            });
