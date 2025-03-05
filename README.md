@@ -7,9 +7,7 @@
 
 <p align="left">
   <img src="https://skillicons.dev/icons?i=svelte" width="84" height="84" alt="svelte" title="svelte" /> &nbsp;
-  <img src="https://skillicons.dev/icons?i=tailwind" width="84" height="84" alt="tailwind" title="tailwind" /> &nbsp;
-  <img src="https://skillicons.dev/icons?i=docker" width="84" height="84" alt="docker" title="docker" />
-
+  <img src="https://skillicons.dev/icons?i=tailwind" width="84" height="84" alt="tailwind" title="tailwind" />
 </p>
 
 ### required project settings to deploy to Github Pages
